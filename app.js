@@ -114,9 +114,16 @@ function activeSession() {
   return state.sessions.find((session) => session.id === state.activeSessionId);
 }
 
+function createId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+  return `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 function createSession(name = "New issue") {
   const session = {
-    id: crypto.randomUUID(),
+    id: createId(),
     name,
     createdAt: new Date().toISOString(),
     messages: []

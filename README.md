@@ -84,3 +84,13 @@ If `localhost:4173` is not responding, run:
 ```
 
 The deploy script now auto-cleans stale PID files and verifies the server is reachable before reporting success.
+
+If you still see a blank page:
+
+```bash
+# restart local server
+./stop_local.sh
+./deploy_local.sh
+```
+
+Then hard-refresh the browser (Ctrl/Cmd+Shift+R). The app now includes compatibility fallbacks for older browsers that do not fully support newer CSS color functions.
