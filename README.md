@@ -1,21 +1,15 @@
-# ClawDBot Command Center X
+# Multi-Agent Newsletter Factory
 
-A major upgrade of the previous prototype into a richer, stateful, execution-focused AI workbench with specialist copilots.
+A browser-based control center for producing a newsletter issue with specialist AI agents.
 
-## What is improved
+## What it does
 
-- Multi-session chat history with quick switching
-- Persisted local state (sessions, model selection, prompt, toggles, selected agents)
-- Expanded slash command workflows (`/plan`, `/spec`, `/debug`, `/ship`, `/risk`, `/squad`)
-- New **Agent Forge** rail with specialist bots (systems architect, research scout, security sentinel, UX critic, delivery commander)
-- One-click **Run selected agents** synthesis to generate a multi-agent plan in the active chat
-- Model selector + live status indicator
-- Conversation analytics cards (message and character metrics)
-- Message tools for copy/reuse
-- Prompt enhancement helpers and context template insertion
-- Export of active session transcript to JSON (including selected agents)
-- Keyboard shortcuts (`Enter` send, `Shift+Enter` newline, `Ctrl/Cmd+K` focus composer)
-- Dark/light theme with responsive layout and improved visual hierarchy
+- Multi-session issue history with local persistence
+- Slash command workflow for editorial stages (`/sources`, `/angles`, `/outline`, `/draft`, `/qa`, `/ship`)
+- Agent team selection and one-click pipeline synthesis
+- Prompt helper chips and structured issue templates
+- Streaming responses, exportable JSON transcript, and basic issue analytics
+- Dark/light theme and keyboard shortcuts (`Enter`, `Shift+Enter`, `Ctrl/Cmd+K`)
 
 ## Run locally
 
@@ -24,3 +18,79 @@ python3 -m http.server 4173
 ```
 
 Open: `http://localhost:4173`
+
+## Build & deploy
+
+This app is static (HTML/CSS/JS), so deployment is just file hosting.
+
+### Deploy to Netlify (quickest)
+
+1. Push this folder to a Git repository.
+2. In Netlify: **Add new site** → **Import an existing project**.
+3. Build command: *(leave empty)*
+4. Publish directory: `.`
+5. Deploy.
+
+### Deploy to Vercel
+
+1. Run:
+   ```bash
+   npx vercel --prod
+   ```
+2. Use `.` as the output directory when prompted.
+
+### Deploy with GitHub Pages
+
+1. Push to GitHub.
+2. Settings → Pages → Deploy from branch.
+3. Select your default branch and `/ (root)`.
+4. Save to publish.
+
+## Suggested first 10 towns to cover
+
+For an AI/business-focused newsletter with broad U.S. audience signal, start with:
+
+1. San Francisco, CA
+2. New York, NY
+3. Seattle, WA
+4. Austin, TX
+5. Boston, MA
+6. Los Angeles, CA
+7. Chicago, IL
+8. Denver, CO
+9. Atlanta, GA
+10. Miami, FL
+
+## Local deployment on your machine
+
+Use the helper scripts in this repo:
+
+```bash
+./deploy_local.sh        # starts on port 4173
+./deploy_local.sh 8080   # starts on a custom port
+```
+
+Stop it with:
+
+```bash
+./stop_local.sh
+```
+
+If `localhost:4173` is not responding, run:
+
+```bash
+./stop_local.sh
+./deploy_local.sh
+```
+
+The deploy script now auto-cleans stale PID files and verifies the server is reachable before reporting success.
+
+If you still see a blank page:
+
+```bash
+# restart local server
+./stop_local.sh
+./deploy_local.sh
+```
+
+Then hard-refresh the browser (Ctrl/Cmd+Shift+R). The app now includes compatibility fallbacks for older browsers that do not fully support newer CSS color functions.

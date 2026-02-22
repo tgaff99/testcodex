@@ -1,73 +1,73 @@
 const quickPrompts = [
-  "Map a 30/60/90-day launch plan with top risks and mitigations.",
-  "Convert this vague request into an implementation spec + acceptance tests.",
-  "Simulate a design review: strengths, weaknesses, and likely objections.",
-  "Create a brutal pre-mortem and propose concrete prevention actions.",
-  "Draft a ship checklist with owners, dependencies, and rollback plan."
+  "Build this week's issue plan for AI engineers (5 sections + CTA).",
+  "Turn these raw links into concise summaries with why-it-matters notes.",
+  "Generate 3 subject lines and pick the best with rationale.",
+  "Create a QA checklist for factual claims, links, and tone.",
+  "Draft a sponsor block that fits a technical newsletter voice."
 ];
 
 const agentCatalog = [
   {
-    id: "architect",
-    name: "Systems Architect",
-    icon: "🏗️",
-    mission: "Breaks problems into components and interfaces.",
-    output: "Creates architecture maps, trade-offs, and sequencing guidance."
-  },
-  {
-    id: "research",
-    name: "Research Scout",
+    id: "scout",
+    name: "Trend Scout",
     icon: "🔎",
-    mission: "Finds unknowns and validates assumptions.",
-    output: "Highlights key questions, missing data, and validation plan."
+    mission: "Finds notable stories and source URLs.",
+    output: "Delivers ranked stories with confidence and freshness signals."
   },
   {
-    id: "security",
-    name: "Security Sentinel",
+    id: "verifier",
+    name: "Fact Verifier",
     icon: "🛡️",
-    mission: "Threat-models abuse, data exposure, and compliance risk.",
-    output: "Produces hardening checklist and highest-impact controls."
+    mission: "Checks claims, dates, quotes, and references.",
+    output: "Flags risky claims and proposes safer, sourced rewrites."
   },
   {
-    id: "ux",
-    name: "UX Critic",
+    id: "strategist",
+    name: "Angle Strategist",
     icon: "🎯",
-    mission: "Optimizes user flow, clarity, and adoption.",
-    output: "Returns friction points, copy updates, and UX experiments."
+    mission: "Builds a narrative angle for the target audience.",
+    output: "Maps hooks, sequencing, and reader takeaway positioning."
   },
   {
-    id: "delivery",
-    name: "Delivery Commander",
+    id: "writer",
+    name: "Draft Writer",
+    icon: "✍️",
+    mission: "Produces clean newsletter sections quickly.",
+    output: "Returns intro, sections, transitions, and CTA in one draft."
+  },
+  {
+    id: "publisher",
+    name: "Distribution Planner",
     icon: "🚀",
-    mission: "Turns strategy into milestones and accountable owners.",
-    output: "Builds rollout plan, dependencies, and rollback criteria."
+    mission: "Prepares send strategy and post-send analysis.",
+    output: "Defines subject line tests, send time, and KPI follow-up."
   }
 ];
 
 const slashProfiles = {
-  plan: {
-    title: "Execution plan",
-    text: "## 3-Phase Plan\n1. **Frame outcome**: define metric, scope, and deadline.\n2. **Ship v1 fast**: prioritize one thin vertical slice.\n3. **Harden + scale**: add guardrails, docs, and observability."
+  sources: {
+    title: "Source pack",
+    text: "## Source Intake\n- Gather 10 candidate links\n- Remove duplicates/outdated items\n- Score for relevance, novelty, and trust\n- Keep top 5 for issue planning"
   },
-  spec: {
-    title: "Specification skeleton",
-    text: "## Spec\n- **Problem**\n- **User stories**\n- **Non-goals**\n- **API/data contract**\n- **Acceptance tests**\n- **Rollout + rollback**"
+  angles: {
+    title: "Story angles",
+    text: "## Angle Options\n1. **What changed this week**\n2. **Operator playbook**\n3. **Market signal and implications**\n\nChoose one primary angle to keep the issue coherent."
   },
-  debug: {
-    title: "Debug protocol",
-    text: "## Debug\n1. Reproduce with minimal case.\n2. Capture expected vs actual.\n3. Identify likely fault domain.\n4. Add temporary instrumentation.\n5. Patch and verify with regression test."
+  outline: {
+    title: "Issue outline",
+    text: "## Outline\n- Hook + promise\n- 3–5 core stories\n- Deep dive\n- Tool/resource pick\n- CTA + next issue teaser"
+  },
+  draft: {
+    title: "Draft protocol",
+    text: "## Draft\n1. Keep sections skimmable\n2. Add one clear insight per section\n3. Cite source context briefly\n4. End with practical next action"
+  },
+  qa: {
+    title: "Editorial QA",
+    text: "## QA Gate\n- ✅ Facts checked\n- ✅ Links valid\n- ✅ Tone consistent\n- ✅ Claims properly hedged\n- ✅ CTA and tracking links verified"
   },
   ship: {
-    title: "Release readiness",
-    text: "## Ship Gate\n- ✅ Risk log updated\n- ✅ Monitoring + alert thresholds\n- ✅ Fallback/rollback rehearsed\n- ✅ Owner + comms plan set"
-  },
-  risk: {
-    title: "Risk matrix",
-    text: "## Top Risks\n- Scope creep\n- Hidden dependency delays\n- Integration regressions\n- Ambiguous ownership\n\nFor each: likelihood, impact, trigger, and contingency."
-  },
-  squad: {
-    title: "Agent squad",
-    text: "Use **Run selected agents** to generate parallel specialist recommendations and a merged execution plan."
+    title: "Send checklist",
+    text: "## Ship\n- Final proofread\n- Subject line A/B variant ready\n- Segment and send time confirmed\n- Dashboard set for open/click/reply rates"
   }
 };
 
@@ -77,7 +77,7 @@ const state = {
   streaming: true,
   theme: "dark",
   sound: false,
-  selectedAgents: ["architect", "delivery"]
+  selectedAgents: ["scout", "writer"]
 };
 
 const chatContainer = document.getElementById("chat-container");
@@ -114,9 +114,16 @@ function activeSession() {
   return state.sessions.find((session) => session.id === state.activeSessionId);
 }
 
-function createSession(name = "New operation") {
+function createId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+  return `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function createSession(name = "New issue") {
   const session = {
-    id: crypto.randomUUID(),
+    id: createId(),
     name,
     createdAt: new Date().toISOString(),
     messages: []
@@ -128,7 +135,7 @@ function createSession(name = "New operation") {
 
 function persist() {
   localStorage.setItem(
-    "clawdbot-command-center-x",
+    "newsletter-factory-state",
     JSON.stringify({
       sessions: state.sessions,
       activeSessionId: state.activeSessionId,
@@ -143,7 +150,7 @@ function persist() {
 }
 
 function loadPersisted() {
-  const raw = localStorage.getItem("clawdbot-command-center-x");
+  const raw = localStorage.getItem("newsletter-factory-state");
   if (!raw) return;
 
   try {
@@ -242,7 +249,7 @@ function addMessage(role, content, meta) {
 
   session.messages.push(message);
   if (role === "user" && session.messages.length <= 2) {
-    session.name = content.slice(0, 26).replace(/\n/g, " ") || "New operation";
+    session.name = content.slice(0, 30).replace(/\n/g, " ") || "New issue";
   }
   const node = renderMessage(message);
   renderSessions();
@@ -321,23 +328,25 @@ function updateAgentBrief() {
 function composeAgentOutput(input) {
   const selected = agentCatalog.filter((agent) => state.selectedAgents.includes(agent.id));
   if (!selected.length) {
-    return "Select at least one agent in Agent Forge before running a squad pass.";
+    return "Select at least one agent before running the pipeline.";
   }
 
   const brief = selected
-    .map((agent) => `### ${agent.icon} ${agent.name}\n- Mission: ${agent.mission}\n- Recommendation: ${agent.output}`)
+    .map((agent) => `### ${agent.icon} ${agent.name}\n- Mission: ${agent.mission}\n- Deliverable: ${agent.output}`)
     .join("\n\n");
 
   return [
-    "## Multi-Agent Synthesis",
-    `Request focus: **${input.trim().slice(0, 180)}${input.trim().length > 180 ? "…" : ""}**`,
+    "## Multi-Agent Newsletter Pipeline",
+    `Issue focus: **${input.trim().slice(0, 180)}${input.trim().length > 180 ? "…" : ""}**`,
     "",
     brief,
     "",
-    "### Unified execution order",
-    "1. Define success metric and target date.",
-    "2. Run discovery + architecture + risk checks in parallel.",
-    "3. Ship smallest high-confidence slice, then harden with observability and rollback rehearsal."
+    "### Unified run order",
+    "1. Gather and rank candidate stories.",
+    "2. Validate facts and remove weak claims.",
+    "3. Select one narrative angle and structure the issue.",
+    "4. Draft concise sections and CTA.",
+    "5. Approve send plan with KPI targets."
   ].join("\n");
 }
 
@@ -363,24 +372,25 @@ function buildAssistantReply(input) {
     const key = trimmed.slice(1).split(" ")[0].toLowerCase();
     const profile = slashProfiles[key];
     if (profile) return `### ${profile.title}\n${profile.text}`;
-    return "Unknown command. Use `/plan`, `/spec`, `/debug`, `/ship`, `/risk`, or `/squad`.";
+    return "Unknown command. Use `/sources`, `/angles`, `/outline`, `/draft`, `/qa`, or `/ship`.";
   }
 
-  const constraints = systemPrompt.value.trim().slice(0, 160);
+  const constraints = systemPrompt.value.trim().slice(0, 180);
   const model = modelSelect.value;
   return [
-    "### Strategic Response",
-    `**Model stance:** ${model}`,
-    `**Request digest:** ${trimmed.slice(0, 240)}${trimmed.length > 240 ? "…" : ""}`,
+    "### Editor Response",
+    `**Model:** ${model}`,
+    `**Issue brief:** ${trimmed.slice(0, 240)}${trimmed.length > 240 ? "…" : ""}`,
     "",
-    "**Execution track**",
-    "- Clarify success metric + owner + due date.",
-    "- Sequence the work into one immediate deliverable and one stabilization phase.",
-    "- Add explicit failure triggers and contingency actions.",
+    "**Recommended next actions**",
+    "- Lock this issue's audience and objective.",
+    "- Produce source shortlist and discard low-confidence items.",
+    "- Build outline and draft with one clear insight per section.",
+    "- Run QA for claims, links, and clarity before send.",
     "",
-    `**Constraint memory:** ${constraints}${systemPrompt.value.length > 160 ? "…" : ""}`,
+    `**Policy memory:** ${constraints}${systemPrompt.value.length > 180 ? "…" : ""}`,
     "",
-    "Run **selected agents** for specialist analysis, or reply `/plan` to produce a phased milestone plan."
+    "Run **pipeline agents** for specialist deliverables, or use `/outline` to generate structure immediately."
   ].join("\n");
 }
 
@@ -400,7 +410,7 @@ async function handleSend() {
   const input = composer.value;
   if (!input.trim()) return;
 
-  addMessage("user", input, `you • ${nowLabel()}`);
+  addMessage("user", input, `editor • ${nowLabel()}`);
   composer.value = "";
 
   const response = buildAssistantReply(input);
@@ -420,11 +430,11 @@ async function handleSend() {
 }
 
 async function runAgents() {
-  const input = composer.value.trim() || "Current active objective";
-  addMessage("user", `🧠 Agent Squad Run\n${input}`, `you • ${nowLabel()}`);
+  const input = composer.value.trim() || "Current issue objective";
+  addMessage("user", `🧠 Pipeline Run\n${input}`, `editor • ${nowLabel()}`);
 
   const synthesis = composeAgentOutput(input);
-  const result = addMessage("assistant", state.streaming ? "" : synthesis, `agent-squad • generating`);
+  const result = addMessage("assistant", state.streaming ? "" : synthesis, `pipeline • generating`);
   if (!result) return;
 
   if (state.streaming) {
@@ -432,7 +442,7 @@ async function runAgents() {
     result.message.content = synthesis;
   }
 
-  result.message.meta = `agent-squad • ${nowLabel()}`;
+  result.message.meta = `pipeline • ${nowLabel()}`;
   result.node.querySelector(".message__meta").textContent = result.message.meta;
   updateMetrics();
   persist();
@@ -445,7 +455,7 @@ function resetChat() {
   session.messages.push({
     role: "system",
     content:
-      "Welcome to **ClawDBot Command Center X**. Drive execution with concrete outcomes, constraints, and clear owners. Use Agent Forge to run specialist copilots.",
+      "Welcome to **Multi-Agent Newsletter Factory**. Define audience, timeframe, and objective, then run the pipeline to generate an issue from sourcing to ship.",
     meta: "system • ready",
     createdAt: new Date().toISOString()
   });
@@ -455,7 +465,7 @@ function resetChat() {
 }
 
 function createNewSession() {
-  createSession(`Operation ${state.sessions.length + 1}`);
+  createSession(`Issue ${state.sessions.length + 1}`);
   resetChat();
 }
 
@@ -464,7 +474,7 @@ function exportTranscript() {
   if (!session) return;
 
   const payload = {
-    app: "ClawDBot Command Center X",
+    app: "Multi-Agent Newsletter Factory",
     exportedAt: new Date().toISOString(),
     model: modelSelect.value,
     selectedAgents: state.selectedAgents,
@@ -492,21 +502,21 @@ clearInputBtn.addEventListener("click", () => {
 improvePromptBtn.addEventListener("click", () => {
   const seed = composer.value.trim();
   composer.value = [
-    "Goal:",
-    seed || "Describe target business/user outcome.",
+    "Audience:",
     "",
-    "Context:",
+    "Primary objective:",
+    seed || "",
     "",
-    "Constraints:",
+    "Source constraints:",
     "",
-    "Definition of done:",
+    "Issue sections required:",
     "",
-    "Output format required:"
+    "Tone and CTA:"
   ].join("\n");
   composer.focus();
 });
 insertContextBtn.addEventListener("click", () => {
-  composer.value += "\n\n<context>\nproject: \nconstraints: \ndeadline: \nowners: \nrisks: \n</context>";
+  composer.value += "\n\n<issue_context>\naudience: \nsend_date: \ncore_themes: \nsource_pool: \ncta: \n</issue_context>";
   composer.focus();
 });
 exportChatBtn.addEventListener("click", exportTranscript);
@@ -545,7 +555,7 @@ document.addEventListener("keydown", (event) => {
 
 loadPersisted();
 if (!state.sessions.length) {
-  createSession("Primary operation");
+  createSession("Issue planning");
   resetChat();
 }
 streamingToggle.checked = state.streaming;
