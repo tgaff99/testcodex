@@ -61,8 +61,16 @@
           <div>
             <h2>Operations Feed</h2>
             <p>Commands: <code>/plan</code> <code>/spec</code> <code>/debug</code> <code>/ship</code> <code>/risk</code> <code>/squad</code></p>
+            <div class="quick-command-bar">
+              <button id="quick-cash-plan">⚡ Cash plan</button>
+              <button id="quick-inbox-sprint">📥 Inbox sprint</button>
+              <button id="quick-hive-deploy">🐝 Hive deploy</button>
+              <button id="quick-vex-brief">🤖 VEX brief</button>
+            </div>
           </div>
           <div class="topbar__right">
+            <button id="density-toggle" class="icon-btn" aria-label="Toggle dense mode">Dense view</button>
+            <button id="focus-toggle" class="icon-btn" aria-label="Toggle focus mode">Focus mode</button>
             <label for="model-select" class="sr-only">Model</label>
             <select id="model-select">
               <option>clawd-omni-max</option>
@@ -80,6 +88,15 @@
           <div class="metric"><span>Slash commands</span><strong id="metric-commands">0</strong></div>
         </section>
 
+        <section class="pulse-ribbon" aria-label="Executive pulse">
+          <div class="pulse-card"><span>Cash velocity</span><strong id="pulse-cash">--</strong></div>
+          <div class="pulse-card"><span>Factory readiness</span><strong id="pulse-factory">--</strong></div>
+          <div class="pulse-card"><span>Hive stability</span><strong id="pulse-hive">--</strong></div>
+          <div class="pulse-card"><span>Inbox pressure</span><strong id="pulse-inbox">--</strong></div>
+          <div class="pulse-card"><span>VEX integration</span><strong id="pulse-vex">--</strong></div>
+          <div class="pulse-card pulse-card--priority"><span>Critical next move</span><strong id="pulse-priority">--</strong></div>
+        </section>
+
         <div class="workspace-grid">
           <section class="chat-container" id="chat-container" aria-live="polite"></section>
 
@@ -95,20 +112,180 @@
               <h2>Agent Brief</h2>
               <div id="agent-brief" class="agent-brief">Select agents to view roles and strengths.</div>
             </section>
+
+            <section class="panel">
+              <h2>Command Queue</h2>
+              <p class="panel-note">Stage high-impact actions, then execute in sequence.</p>
+              <ul id="command-queue" class="command-queue"></ul>
+              <div class="button-grid">
+                <button id="run-queued" class="primary">Run queued actions</button>
+                <button id="clear-queued">Clear queue</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <h2>Influencer Intelligence Module</h2>
+              <p class="panel-note">Quant + qual analysis of the ClawDBot influencer community.</p>
+              <div class="community-metrics">
+                <div><span>Weighted health score</span><strong id="community-score">--</strong></div>
+                <div><span>Growth signal</span><strong id="community-signal">--</strong></div>
+                <div><span>Sentiment consensus</span><strong id="community-consensus">--</strong></div>
+              </div>
+              <div class="table-wrap">
+                <table class="influencer-table">
+                  <thead>
+                    <tr><th>Influencer</th><th>Influence score</th><th>Archetype</th></tr>
+                  </thead>
+                  <tbody id="influencer-table-body"></tbody>
+                </table>
+              </div>
+              <div id="influencer-agent-list" class="agent-list"></div>
+              <div id="influencer-brief" class="agent-brief">Pick community agents to activate campaign design.</div>
+              <button id="run-influencer-module" class="primary">Generate influencer activation plan</button>
+            </section>
+
+            <section class="panel">
+              <h2>Venture Factory</h2>
+              <p class="panel-note">Target: automate enough workflow to launch 2 cash businesses/day.</p>
+              <div class="community-metrics venture-metrics">
+                <div><span>Automation coverage</span><strong id="factory-coverage">--</strong></div>
+                <div><span>Daily venture throughput</span><strong id="factory-throughput">--</strong></div>
+                <div><span>Readiness score</span><strong id="factory-readiness">--</strong></div>
+              </div>
+              <div class="table-wrap">
+                <table class="influencer-table capability-table">
+                  <thead>
+                    <tr><th>Capability</th><th>Status</th><th>Gap</th></tr>
+                  </thead>
+                  <tbody id="capability-table-body"></tbody>
+                </table>
+              </div>
+              <div id="factory-agent-list" class="agent-list"></div>
+              <div id="factory-brief" class="agent-brief">Choose factory agents to orchestrate business launch automation.</div>
+              <button id="run-factory-module" class="primary">Generate 2-business/day operating module</button>
+            </section>
+
+            <section class="panel">
+              <h2>Inbox & Notes Ops</h2>
+              <p class="panel-note">Email triage and note sorting tuned for fast deal flow and follow-through.</p>
+              <div class="community-metrics email-metrics">
+                <div><span>Inbox burn-down</span><strong id="inbox-burndown">--</strong></div>
+                <div><span>Revenue signal score</span><strong id="revenue-signal">--</strong></div>
+                <div><span>Note clarity index</span><strong id="note-clarity">--</strong></div>
+              </div>
+              <div class="table-wrap">
+                <table class="influencer-table capability-table">
+                  <thead>
+                    <tr><th>Email Queue</th><th>Priority</th><th>Action</th></tr>
+                  </thead>
+                  <tbody id="email-queue-body"></tbody>
+                </table>
+              </div>
+              <div class="table-wrap">
+                <table class="influencer-table capability-table">
+                  <thead>
+                    <tr><th>Notes Bucket</th><th>Count</th><th>Next Move</th></tr>
+                  </thead>
+                  <tbody id="notes-bucket-body"></tbody>
+                </table>
+              </div>
+              <div class="button-grid">
+                <button id="draft-inbox-zero">Draft inbox zero sprint</button>
+                <button id="run-notes-sort" class="primary">Run notes sorting protocol</button>
+              </div>
+              <div id="notes-ops-brief" class="agent-brief">Run the protocol to generate next actions for email and notes.</div>
+            </section>
+
+            <section class="panel">
+              <h2>Clawbot Mission Stack</h2>
+              <p class="panel-note">Unifies autonomy, safety, and monetization rollout into one deployable execution track.</p>
+              <div class="community-metrics vex-metrics">
+                <div><span>System integration score</span><strong id="vex-integration-score">--</strong></div>
+                <div><span>Competition readiness</span><strong id="vex-readiness">--</strong></div>
+                <div><span>Monetization traction</span><strong id="vex-monetization">--</strong></div>
+              </div>
+              <div class="table-wrap">
+                <table class="influencer-table capability-table">
+                  <thead>
+                    <tr><th>Track</th><th>Status</th><th>Next move</th></tr>
+                  </thead>
+                  <tbody id="vex-track-body"></tbody>
+                </table>
+              </div>
+              <div class="button-grid">
+                <button id="build-vex-stack">Build unified VEX stack brief</button>
+                <button id="run-vex-rollout" class="primary">Run full app + bot rollout</button>
+              </div>
+              <div id="vex-ops-brief" class="agent-brief">Generate the stack brief to combine all generated versions into one ship plan.</div>
+            </section>
+
+
+
+            <section class="panel">
+              <h2>Unified Ops Launcher</h2>
+              <p class="panel-note">Best-of workflow packs that combine growth, execution, and delivery into one run.</p>
+              <div class="community-metrics launch-metrics">
+                <div><span>Stack coherence</span><strong id="launch-coherence">--</strong></div>
+                <div><span>Revenue pressure fit</span><strong id="launch-revenue-fit">--</strong></div>
+                <div><span>Ship readiness</span><strong id="launch-readiness">--</strong></div>
+              </div>
+              <div id="launcher-list" class="agent-list"></div>
+              <div id="launcher-brief" class="agent-brief">Choose a launcher pack to stage its actions.</div>
+              <div class="button-grid">
+                <button id="stage-launcher-pack">Stage selected pack</button>
+                <button id="run-launcher-pack" class="primary">Run selected pack now</button>
+              </div>
+            </section>
+            <section class="panel">
+              <h2>Viral Thread Studio</h2>
+              <p class="panel-note">Turn product wins into high-velocity 8-part X threads with hooks, debate prompts, and CTAs.</p>
+              <div class="community-metrics thread-metrics">
+                <div><span>Hook strength</span><strong id="thread-hook-score">--</strong></div>
+                <div><span>Reply bait density</span><strong id="thread-reply-score">--</strong></div>
+                <div><span>Share potential</span><strong id="thread-share-score">--</strong></div>
+              </div>
+              <label for="thread-angle" class="sr-only">Thread angle</label>
+              <textarea id="thread-angle" rows="3" placeholder="Angle: what transformation/result should the thread prove?"></textarea>
+              <div class="button-grid">
+                <button id="generate-thread-blueprint" class="primary">Generate 8-post viral thread</button>
+                <button id="queue-thread-launch">Queue thread launch workflow</button>
+              </div>
+              <ul id="thread-checklist" class="autopilot-actions"></ul>
+              <div id="thread-brief" class="agent-brief">Generate a thread to populate hook, structure, and CTA suggestions.</div>
+            </section>
+
           </aside>
         </div>
 
         <footer class="composer-wrap">
-          <label for="composer" class="sr-only">Message ClawDBot</label>
-          <textarea id="composer" rows="4" placeholder="Describe outcome, constraints, and deadline... (Enter to send, Shift+Enter newline)"></textarea>
-          <div class="composer-actions">
-            <div class="left-actions">
-              <button id="insert-context">Insert context template</button>
-              <button id="improve-prompt">Auto-improve prompt</button>
-              <button id="clear-input">Clear input</button>
+          <section class="composer-column">
+            <label for="composer" class="sr-only">Message ClawDBot</label>
+            <textarea id="composer" rows="4" placeholder="Describe outcome, constraints, and deadline... (Enter to send, Shift+Enter newline)"></textarea>
+            <div class="composer-actions">
+              <div class="left-actions">
+                <button id="insert-context">Insert context template</button>
+                <button id="improve-prompt">Auto-improve prompt</button>
+                <button id="clear-input">Clear input</button>
+              </div>
+              <button id="send-btn" class="primary">Send ↵</button>
             </div>
-            <button id="send-btn" class="primary">Send ↵</button>
-          </div>
+          </section>
+
+          <section class="autopilot-board panel">
+            <h2>Subagent Hive Control</h2>
+            <p class="panel-note">Deploy and steer a 300-agent autonomous swarm focused on cash acceleration.</p>
+            <div class="community-metrics autopilot-metrics">
+              <div><span>Hive agents online</span><strong id="hive-online">--</strong></div>
+              <div><span>Daily cash projection</span><strong id="hive-cash">--</strong></div>
+              <div><span>Autonomy stability</span><strong id="hive-stability">--</strong></div>
+            </div>
+            <ol id="hive-priorities" class="autopilot-actions"></ol>
+            <div class="button-grid">
+              <button id="stage-hive-brief">Stage hive command brief</button>
+              <button id="deploy-hive" class="primary">Deploy 300 subagents</button>
+            </div>
+            <div id="hive-brief-preview" class="agent-brief">Hive command brief will appear here.</div>
+          </section>
         </footer>
       </main>
     </div>
